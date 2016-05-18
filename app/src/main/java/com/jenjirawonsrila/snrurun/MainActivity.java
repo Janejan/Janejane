@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private MyManage myManage;
     private ImageView imageView ;
     private EditText userEditText,passwordEditText;
+    private String userString,passwordString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     }//Main Method
+
+    public void clickSignIn(View view){
+
+        userString = userEditText.getText().toString().trim();
+        passwordString = passwordEditText.getText().toString().trim();
+
+
+        //Check Space
+        if (userString.equals("")|| passwordString.equals("")) {
+
+            MyAlert myAlert =new MyAlert();
+            myAlert.myDialog(this,"มีช่องว่าง","โปรดกรอกให้ครบทุกช่อง");
+
+        }else{
+
+        }
+
+    }//ClickSignIn
+
 
 
     //Create Inner Class
