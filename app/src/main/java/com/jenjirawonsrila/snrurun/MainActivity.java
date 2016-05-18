@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.speech.tts.Voice;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,24 +24,26 @@ public class MainActivity extends AppCompatActivity {
 
     //Explicit
     private MyManage myManage;
-    private ImageView imageView ;
-    private EditText userEditText,passwordEditText;
-    private String userString,passwordString;
+    private ImageView imageView;
+    private EditText userEditText, passwordEditText;
+    private String userString, passwordString;
     private String[] userStrings;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Bind
+        //Bind Widget
         imageView = (ImageView) findViewById(R.id.imageView6);
-        userEditText = (EditText)findViewById(R.id.editText4);
-        passwordEditText =(EditText)findViewById(R.id.editText5);
+        userEditText = (EditText) findViewById(R.id.editText4);
+        passwordEditText = (EditText) findViewById(R.id.editText5);
 
         myManage = new MyManage(MainActivity.this);
 
         //Test Add user
-        //myManage.addUser("เจนจิรา","janejira", "000000","2");
+        //myManage.addUser("มาสเตอร์ อึ่ง", "master", "12345", "2");
 
         //Delete All SQLite
         deleteAllSQLite();
@@ -52,108 +52,115 @@ public class MainActivity extends AppCompatActivity {
         MySynchronize mySynchronize = new MySynchronize();
         mySynchronize.execute();
 
-        //show
-
+        //Show Logo
         Picasso.with(MainActivity.this)
                 .load("http://swiftcodingthai.com/snru/image/logo_snru.png")
                 .resize(200,250)
                 .into(imageView);
 
+    }   // Main Method
 
-    }//Main Method
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-    public void clickSignIn(View view){
+        deleteAllSQLite();
+        MySynchronize mySynchronize = new MySynchronize();
+        mySynchronize.execute();
+
+    }
+
+    public void clickSignIn(View view) {
 
         userString = userEditText.getText().toString().trim();
         passwordString = passwordEditText.getText().toString().trim();
 
-
         //Check Space
-        if (userString.equals("")|| passwordString.equals("")) {
+        if (userString.equals("") || passwordString.equals("")) {
 
-            MyAlert myAlert =new MyAlert();
-            myAlert.myDialog(this,"มีช่องว่าง","โปรดกรอกให้ครบทุกช่อง");
+            MyAlert myAlert = new MyAlert();
+            myAlert.myDialog(this, "มีช่องว่าง", "โปรดกรอกให้ครบทุกช่อง");
 
-        }else{
+        } else {
 
             checkUser();
 
         }
 
-    }//ClickSignIn
+    }   // clickSignIn
 
     private void checkUser() {
 
         try {
 
             SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
-                    MODE_PRIVATE,null);
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM userTABLE WHERE User = "+"'"+userString+"'",null);
+                    MODE_PRIVATE, null);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM userTABLE WHERE User = " + "'" + userString + "'", null);
             cursor.moveToFirst();
             userStrings = new String[cursor.getColumnCount()];
 
-            for (int i=0;i<cursor.getColumnCount();i++){
-                userStrings[i]= cursor.getString(i);
+            for (int i=0;i<cursor.getColumnCount();i++) {
+                userStrings[i] = cursor.getString(i);
             }
 
-            //check password
-            if (passwordString.equals(userStrings[3])){
+            //Check Password
+            if (passwordString.equals(userStrings[3])) {
 
-                Toast.makeText(this,"ยินดีต้อนรับ"+userStrings[1],Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "ยินดีต้อนรับ " + userStrings[1], Toast.LENGTH_SHORT).show();
 
-                Intent intent =new Intent(MainActivity.this,MapsActivity.class);
-                intent.putExtra("User",userString);
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                intent.putExtra("User", userStrings);
                 startActivity(intent);
                 finish();
 
-            }else {
+            } else {
+
                 MyAlert myAlert = new MyAlert();
-                myAlert.myDialog(this,"Password False","Please Try Again Password False");
+                myAlert.myDialog(this, "Password False", "Please Try Again Password False");
+
             }
 
 
-        }catch (Exception e){
-            MyAlert myAlert  = new MyAlert();
-            myAlert.myDialog(this,"ไม่มี  user นี้", "ไม่มี"+ userString+" ในฐานข้อมูลของเรา");
 
+        } catch (Exception e) {
+            MyAlert myAlert = new MyAlert();
+            myAlert.myDialog(this, "ไม่มี user นี่", "ไม่มี " + userString + " ในฐานข้อมูลของเรา");
         }
 
-    }
-
+    }   // checkUser
 
 
     //Create Inner Class
     public class MySynchronize extends AsyncTask<Void, Void, String> {
+
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(Void... voids) {
 
             try {
 
-                OkHttpClient okHttpClient  =new OkHttpClient();
-                Request.Builder builder =new Request.Builder();
+                OkHttpClient okHttpClient = new OkHttpClient();
+                Request.Builder builder = new Request.Builder();
                 Request request = builder.url("http://swiftcodingthai.com/snru/get_user.php").build();
                 Response response = okHttpClient.newCall(request).execute();
 
                 return response.body().string();
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 return null;
-
             }
-
             //return null;
-        }//doInBack
+        }   // doInBack
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            Log.d("Snru", "JSON=="+s);
+            Log.d("Snru", "JSON ==> " + s);
 
-            try{
+            try {
 
                 JSONArray jsonArray = new JSONArray(s);
-                for (int i=0;i<jsonArray.length();i++){
+                for (int i=0;i<jsonArray.length();i++) {
 
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String strName = jsonObject.getString(MyManage.column_name);
@@ -161,29 +168,28 @@ public class MainActivity extends AppCompatActivity {
                     String strPassword = jsonObject.getString(MyManage.column_password);
                     String strAvata = jsonObject.getString(MyManage.column_avata);
 
-                    myManage.addUser(strName,strUser,strPassword,strAvata);
+                    myManage.addUser(strName, strUser, strPassword, strAvata);
 
-                }//for
+                }   // for
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-        }//onPost
+        }   // onPost
 
-
-    }//MySyn Class
-
+    }   // // MySyn Class
 
 
     private void deleteAllSQLite() {
 
         SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
-                MODE_PRIVATE,null);
-        sqLiteDatabase.delete(MyManage.user_table,null,null);
+                MODE_PRIVATE, null);
+        sqLiteDatabase.delete(MyManage.user_table, null, null);
     }
 
-    public void clickSignUpMain(View view){
-        startActivity(new Intent(MainActivity.this,SignUp.class));    }
+    public void clickSignUpMain(View view) {
+        startActivity(new Intent(MainActivity.this, SignUp.class));
+    }
 
-}//Main Class นี่คือคลาสหลัก
+}   // Main Class นี่คือ คลาสหลัก
