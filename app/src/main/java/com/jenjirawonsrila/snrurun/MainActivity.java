@@ -1,6 +1,7 @@
 package com.jenjirawonsrila.snrurun;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.speech.tts.Voice;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView ;
     private EditText userEditText,passwordEditText;
     private String userString,passwordString;
-
+    private String[] userStrings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +76,49 @@ public class MainActivity extends AppCompatActivity {
 
         }else{
 
+            checkUser();
+
         }
 
     }//ClickSignIn
+
+    private void checkUser() {
+
+        try {
+
+            SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
+                    MODE_PRIVATE,null);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM userTABLE WHERE User = "+"'"+userString+"'",null);
+            cursor.moveToFirst();
+            userStrings = new String[cursor.getColumnCount()];
+
+            for (int i=0;i<cursor.getColumnCount();i++){
+                userStrings[i]= cursor.getString(i);
+            }
+
+            //check password
+            if (passwordString.equals(userStrings[3])){
+
+                Toast.makeText(this,"ยินดีต้อนรับ"+userStrings[1],Toast.LENGTH_SHORT).show();
+
+                Intent intent =new Intent(MainActivity.this,MapsActivity.class);
+                intent.putExtra("User",userString);
+                startActivity(intent);
+                finish();
+
+            }else {
+                MyAlert myAlert = new MyAlert();
+                myAlert.myDialog(this,"Password False","Please Try Again Password False");
+            }
+
+
+        }catch (Exception e){
+            MyAlert myAlert  = new MyAlert();
+            myAlert.myDialog(this,"ไม่มี  user นี้", "ไม่มี"+ userString+" ในฐานข้อมูลของเรา");
+
+        }
+
+    }
 
 
 

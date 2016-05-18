@@ -72,9 +72,9 @@ public class SignUp extends AppCompatActivity {
 
     private void bindWidget() {
 
-        nameEditText = (EditText) findViewById(R.id.editText);
-        userEditText = (EditText) findViewById(R.id.editText2);
-        passwordEditText = (EditText) findViewById(R.id.editText3);
+        nameEditText = (EditText) findViewById(R.id.editText3);
+        userEditText = (EditText) findViewById(R.id.editText);
+        passwordEditText = (EditText) findViewById(R.id.editText2);
         radioGroup = (RadioGroup) findViewById(R.id.ragAvata);
         choice1RadioButton = (RadioButton) findViewById(R.id.radioButton);
         choice2RadioButton = (RadioButton) findViewById(R.id.radioButton2);
