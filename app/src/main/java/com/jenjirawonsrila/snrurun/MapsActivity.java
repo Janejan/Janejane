@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -56,6 +57,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         userStrings = getIntent().getStringArrayExtra("User");
 
     }   // Main Method
+
+    //Inner class
+    public class SynLocation extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+            return null;
+        }//doInBack
+
+
+    }//SynLocation
+
 
     @Override
     protected void onResume() {
@@ -150,6 +162,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d("18May16", "myLng = " + myLngADouble);
 
         updateLocation();
+        
+        createAllMarker();
 
 
 
@@ -163,6 +177,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }, 3000);
 
     }   // myLoop
+
+    private void createAllMarker() {
+    }
 
     private void updateLocation() {
 
